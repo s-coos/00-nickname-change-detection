@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "@this-project/00-nickname-change-detection",
+  "scripts": {
+    "dev": "tsx src"
+  },
+  "dependencies": {
+    "@racla-dev/node-iris": "file:../../node-iris"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
