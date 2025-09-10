@@ -1,4 +1,5 @@
 import { Bot, ChatContext } from "@racla-dev/node-iris";
+import { parse } from "./util/parse";
 
 const bot = new Bot("BotName", "127.0.0.1:3000", { maxWorkers: 4 });
 
@@ -24,26 +25,41 @@ async function detectNicknameChange() {
     try {
       const queryResult = await fetch("http://localhost:3000/query", {
         method: "POST",
-        headers: { accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           query:
             "select enc, nickname, user_id from db2.open_chat_member where involved_chat_id = $1",
           bind: [room],
         }),
       });
-      const json = await queryResult.json();
-      if (members[json.user_id] && members[json.user_id] !== json.nickname) {
-        await fetch("http://localhost:3000/reply", {
-          method: "POST",
-          headers: { accept: "application/json" },
-          body: JSON.stringify({
-            message: `${json.user_id}의 닉네임이 변경되었습니다:\n변경 전: ${
-              members[json.user_id]
-            }\n변경 후: ${json.nickname}`,
-          }),
-        });
+
+      if (!queryResult.ok) {
+        throw new Error(`HTTP error! status: ${queryResult.status}`);
       }
-      members[json.user_id] = json.nickname;
+
+      const json = parse(await queryResult.text());
+      for (const row of json.data) {
+        const userId = row.user_id.toString();
+        if (members[userId] && members[userId] !== row.nickname) {
+          const fetchResult = await fetch("http://localhost:3000/reply", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: "text",
+              room,
+              data: `${userId}의 닉네임이 변경되었습니다:\n변경 전: ${members[userId]}\n변경 후: ${row.nickname}`,
+            }),
+          });
+          console.log(fetchResult);
+        }
+        members[userId] = row.nickname;
+      }
     } catch (e) {
       console.error(e);
     }

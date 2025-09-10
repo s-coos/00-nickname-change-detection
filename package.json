@@ -5,7 +5,7 @@
     "dev": "tsx src"
   },
   "dependencies": {
-    "@racla-dev/node-iris": "file:../../node-iris"
+    "lossless-json": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
