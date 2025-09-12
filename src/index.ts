@@ -27,7 +27,7 @@ async function detectNicknameChange() {
       for (const row of json.data) {
         const userId = row.user_id.toString();
         if (members[userId] && members[userId] !== row.nickname) {
-          const fetchResult = await fetch("http://localhost:3000/reply", {
+          await fetch("http://localhost:3000/reply", {
             method: "POST",
             headers: {
               Accept: "application/json",
@@ -39,7 +39,6 @@ async function detectNicknameChange() {
               data: `${userId}의 닉네임이 변경되었습니다:\n변경 전: ${members[userId]}\n변경 후: ${row.nickname}`,
             }),
           });
-          console.log(fetchResult);
         }
         members[userId] = row.nickname;
       }
