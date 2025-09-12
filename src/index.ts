@@ -1,24 +1,7 @@
-import { Bot, ChatContext } from "@racla-dev/node-iris";
 import { parse } from "./util/parse";
 
-const bot = new Bot("BotName", "127.0.0.1:3000", { maxWorkers: 4 });
-
 const rooms: string[] = ["18461285930353763"];
-const roomMap: Partial<Record<string, true>> = Object.fromEntries(
-  rooms.map((s) => [s, true])
-);
 const members: Partial<Record<string, string>> = {};
-
-// 메시지 이벤트 핸들러
-bot.on("message", async (context: ChatContext) => {
-  if (!(context.room.id in roomMap)) {
-    return;
-  }
-
-  if (context.message.command === "안녕") {
-    await context.reply("안녕하세요!");
-  }
-});
 
 async function detectNicknameChange() {
   for (const room of rooms) {
@@ -70,6 +53,3 @@ setTimeout(async function func() {
   await detectNicknameChange();
   setTimeout(func, 2000); // polling rate
 }, 0);
-
-// 봇 시작
-bot.run();
